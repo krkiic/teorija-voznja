@@ -1,0 +1,815 @@
+<!doctype html>
+<html lang="sr-Latn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F5F4F0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0D0F13" media="(prefers-color-scheme: dark)">
+<title>Vozački B</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=Inter:opsz,wght@14..32,400..700&display=swap" rel="stylesheet">
+<style>
+/* Dizajn: „Signal" (tokeni, komponente, pokret) */
+:root{ color-scheme:light dark;
+  --bg:#F5F4F0; --surface:#FFFFFF; --surface-2:#EDEBE6; --elevated:#FFFFFF;
+  --line:#E3E1DB; --line-strong:#8F949C;
+  --ink:#16181D; --ink-2:#3D424D; --muted:#626873;
+  --accent:#1D5BD8; --accent-lip:#1646AE; --accent-tint:#E8EFFD; --on-accent:#FFF;
+  --correct:#16803C; --correct-lip:#0F6A30; --correct-tint:#E6F4EA; --correct-ink:#0E6630;
+  --wrong:#D92D20; --wrong-lip:#A8231A; --wrong-tint:#FDECEA; --wrong-ink:#B42318;
+  --warn:#F5B400; --warn-tint:#FFF4D6; --warn-ink:#8A5300; --focus:#1D5BD8; --sh:40 12% 25%;
+  --e1:0 1px 2px hsl(var(--sh)/.06),0 2px 6px hsl(var(--sh)/.04);
+  --e2:0 1px 2px hsl(var(--sh)/.06),0 4px 8px hsl(var(--sh)/.06),0 12px 24px -6px hsl(var(--sh)/.08);
+  --e3:0 -12px 32px -8px hsl(var(--sh)/.14);
+  --ease-out:cubic-bezier(.2,0,0,1); --ease-enter:cubic-bezier(.05,.7,.1,1); --ease-exit:cubic-bezier(.3,0,.8,.15);
+  --ease-spring:cubic-bezier(.34,1.56,.64,1);
+  --font:"Inter",ui-sans-serif,-apple-system,system-ui,"Segoe UI",Roboto,sans-serif;
+  --display:"Bricolage Grotesque","Inter",ui-sans-serif,-apple-system,system-ui,sans-serif;
+  --noise:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.5'/%3E%3C/svg%3E");
+}
+@supports (animation-timing-function:linear(0,1)){ :root{ --ease-spring:linear(0,1.25,1,.9,1.04,.99,1.005,.996,1.001,.999,1); } }
+@media (prefers-color-scheme:dark){ :root{
+  --bg:#0D0F13; --surface:#16181D; --surface-2:#23262E; --elevated:#1E2128;
+  --line:#262A32; --line-strong:#666D79; --ink:#EDEEF0; --ink-2:#B4BAC4; --muted:#8C929D;
+  --accent:#6B98FF; --accent-lip:#3F6FD9; --accent-tint:#1A2440; --on-accent:#0D0F13;
+  --correct:#3DD68C; --correct-lip:#23A866; --correct-tint:#0F2A1D; --correct-ink:#5BE3A0;
+  --wrong:#FF6B5E; --wrong-lip:#D9483C; --wrong-tint:#2E1614; --wrong-ink:#FF8A7F;
+  --warn:#FFC53D; --warn-tint:#2B2210; --warn-ink:#FFC53D; --focus:#7AA2FF;
+  --e1:inset 0 1px 0 rgb(255 255 255/.04); --e2:inset 0 1px 0 rgb(255 255 255/.06); --e3:0 -12px 32px -8px rgb(0 0 0/.5);
+}}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scrollbar-gutter:stable}
+body{margin:0;min-height:100dvh;background:var(--bg);color:var(--ink);font:400 16px/24px var(--font);letter-spacing:-.011em;
+  font-feature-settings:"cv11","ss01";-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent}
+body::before{content:"";position:fixed;inset:0;background-image:var(--noise);opacity:.035;pointer-events:none;z-index:0;mix-blend-mode:multiply}
+@media (prefers-color-scheme:dark){ body::before{opacity:.05;mix-blend-mode:screen} }
+button{font:inherit;color:inherit;touch-action:manipulation}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-radius:10px}
+.tnum{font-variant-numeric:tabular-nums}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+#app{position:relative;z-index:1;max-width:640px;margin:0 auto;padding:0 16px calc(140px + env(safe-area-inset-bottom))}
+@media (min-width:600px){ #app{padding-left:24px;padding-right:24px} }
+
+/* ---------- tipografija ---------- */
+.overline{font:600 12px/16px var(--font);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.t1{font:700 30px/36px var(--display);letter-spacing:-.022em;margin:0;font-optical-sizing:auto}
+.t2{font:700 20px/26px var(--display);letter-spacing:-.015em;margin:0}
+.muted{color:var(--muted)} .ink2{color:var(--ink-2)}
+.label{font:500 14px/20px var(--font);letter-spacing:0}
+
+/* ---------- početna ---------- */
+.home-top{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding:calc(20px + env(safe-area-inset-top)) 0 18px}
+.iconbtn{width:44px;height:44px;border-radius:12px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;cursor:pointer;box-shadow:var(--e1);flex:none}
+.iconbtn svg{width:20px;height:20px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:20px;box-shadow:var(--e1);padding:20px;margin-bottom:12px}
+.card.raised{box-shadow:var(--e2)}
+.hero{display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:center}
+.hero-stats{display:flex;flex-direction:column;gap:6px}
+.hero-stats .row{display:flex;justify-content:space-between;gap:8px;font-size:15px}
+.hero-stats b{font-weight:650}
+.ring{display:block}
+.ring circle{fill:none}
+.ring .trk{stroke:var(--surface-2)}
+.ring .val{stroke:var(--accent);stroke-linecap:round;transition:stroke-dashoffset .9s var(--ease-out),stroke .3s}
+.ring.done .val{stroke:var(--correct)}
+.ringwrap{position:relative;display:grid;place-items:center}
+.ringwrap .c{position:absolute;text-align:center;line-height:1}
+.ringwrap .c b{display:block;font:800 30px/1 var(--display);letter-spacing:-.03em}
+.ringwrap .c span{font-size:12px;color:var(--muted)}
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:52px;border:0;border-radius:14px;cursor:pointer;
+  font:600 17px/22px var(--font);letter-spacing:-.01em;background:var(--accent);color:var(--on-accent);
+  background-image:linear-gradient(rgb(255 255 255/.12),transparent);box-shadow:0 3px 0 var(--accent-lip),inset 0 1px 0 rgb(255 255 255/.15);
+  transition:transform 80ms var(--ease-out),box-shadow 80ms var(--ease-out),background-color .2s}
+.btn:active:not([disabled]){transform:translateY(3px);box-shadow:0 0 0 var(--accent-lip)}
+.btn[disabled]{background:var(--surface-2);color:var(--muted);box-shadow:none;background-image:none;cursor:default}
+.btn.sec{background:var(--surface);color:var(--ink);border:1.5px solid var(--line);box-shadow:0 2px 0 var(--line);background-image:none}
+.btn.sec:active{box-shadow:0 0 0 var(--line)}
+.btn.ok{background-color:var(--correct);box-shadow:0 3px 0 var(--correct-lip)}
+.btn.bad{background-color:var(--wrong);box-shadow:0 3px 0 var(--wrong-lip)}
+.btn small{font-weight:500;opacity:.85;font-size:13px}
+.btn-col{display:flex;flex-direction:column;align-items:center;gap:0;line-height:1.2}
+.btnrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.cta{margin-top:18px}
+.chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 10px;font:600 13px/20px var(--font);background:var(--surface-2);color:var(--ink-2)}
+.chip.warn{background:var(--warn-tint);color:var(--warn-ink)}
+.chip.ok{background:var(--correct-tint);color:var(--correct-ink)}
+.chip.bad{background:var(--wrong-tint);color:var(--wrong-ink)}
+.chip.acc{background:var(--accent-tint);color:var(--accent)}
+
+.track{display:flex;align-items:center;gap:6px;margin:4px 0 2px}
+.dot{flex:1;height:10px;border-radius:999px;background:var(--surface-2);position:relative}
+.dot.s1{background:repeating-linear-gradient(90deg,var(--accent) 0 5px,transparent 5px 9px);opacity:.8}
+.dot.s2{background:var(--accent)}
+.dot.today{outline:2px solid var(--accent);outline-offset:2px}
+.flag{flex:none;font-size:15px}
+.track-lbl{display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+
+.ready{display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:center}
+.bignum{font:800 48px/52px var(--display);letter-spacing:-.03em}
+.bignum.r{color:var(--wrong-ink)} .bignum.a{color:var(--warn-ink)} .bignum.g{color:var(--correct-ink)}
+.meter{position:relative;height:10px;border-radius:999px;background:var(--surface-2);margin:12px 0 6px;overflow:visible}
+.meter>i{position:absolute;left:0;top:0;bottom:0;border-radius:999px;background:var(--accent);transition:width .9s var(--ease-out)}
+.meter .thr{position:absolute;top:-5px;bottom:-5px;width:2px;background:var(--ink);border-radius:2px}
+.meter .thr::after{content:"85%";position:absolute;top:-18px;left:50%;transform:translateX(-50%);font-size:11px;color:var(--muted);font-weight:600}
+.areas{display:flex;flex-direction:column;gap:9px;margin-top:16px}
+.area{display:grid;grid-template-columns:1fr 64px;gap:4px 10px;font-size:14px;align-items:center}
+.area .nm{display:flex;gap:6px;min-width:0;align-items:baseline}
+.area .nm .n{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.area .nm .q{flex:none}
+.area .q{color:var(--muted);font-size:12px}
+.area .v{text-align:right;font-weight:600}
+.area .bar{grid-column:1/-1;height:6px;border-radius:999px;background:var(--surface-2);overflow:hidden}
+.area .bar i{display:block;height:100%;border-radius:999px;background:var(--wrong);opacity:.85}
+.note{font-size:12.5px;line-height:18px;color:var(--muted);margin-top:12px}
+
+.map{display:grid;grid-template-columns:repeat(auto-fill,minmax(26px,1fr));gap:5px;margin-top:12px}
+.cell{aspect-ratio:1;border-radius:7px;border:0;background:var(--surface-2);cursor:pointer;padding:0;transition:transform .15s var(--ease-spring)}
+.cell:hover{transform:scale(1.12)}
+.cell.g{background:var(--correct)} .cell.a{background:var(--warn)} .cell.r{background:var(--wrong)}
+.cell.p{background:repeating-linear-gradient(135deg,var(--accent) 0 3px,var(--accent-tint) 3px 6px)}
+.cell.cur{outline:2px solid var(--accent);outline-offset:2px}
+.legend{display:flex;flex-wrap:wrap;gap:12px;font-size:12px;color:var(--muted);margin-top:10px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.linkbtn{background:none;border:0;color:var(--accent);font-weight:600;cursor:pointer;padding:6px 0}
+.sechead{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.bars{display:flex;align-items:flex-end;justify-content:space-between;gap:6px;height:84px;margin-top:14px;position:relative}
+.bars .b{flex:1;max-width:44px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;height:100%}
+.bars .b i{display:block;width:100%;border-radius:6px 6px 3px 3px;background:var(--accent-tint);position:relative;min-height:3px}
+.bars .b i s{position:absolute;left:0;right:0;bottom:0;border-radius:inherit;background:var(--accent)}
+.bars .b span{font-size:10.5px;color:var(--muted)}
+.bars .thr{position:absolute;left:0;right:0;border-top:1.5px dashed var(--muted);opacity:.6}
+
+/* ---------- lekcije (lista) ---------- */
+.topbar{position:sticky;top:0;z-index:5;display:flex;align-items:center;gap:12px;height:calc(60px + env(safe-area-inset-top));padding-top:env(safe-area-inset-top);
+  margin:0 -16px 8px;padding-left:16px;padding-right:16px;background:color-mix(in oklab,var(--bg) 72%,transparent);
+  -webkit-backdrop-filter:saturate(180%) blur(16px);backdrop-filter:saturate(180%) blur(16px);border-bottom:1px solid transparent;transition:border-color .2s}
+@media (min-width:600px){ .topbar{margin:0 -24px 8px;padding-left:24px;padding-right:24px} }
+.topbar.scrolled{border-bottom-color:var(--line)}
+.prog{flex:1;height:8px;border-radius:999px;background:repeating-linear-gradient(90deg,var(--line) 0 8px,transparent 8px 14px);overflow:hidden}
+.prog i{display:block;height:100%;border-radius:999px;background:var(--accent);transition:width .5s var(--ease-out);position:relative;overflow:hidden}
+.prog i::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgb(255 255 255/.45),transparent);transform:translateX(-100%)}
+.prog i.sheen::after{animation:sheen .8s var(--ease-out)}
+@keyframes sheen{to{transform:translateX(100%)}}
+.grp{margin:22px 0 6px}
+.lrow{display:grid;grid-template-columns:44px 1fr auto;gap:14px;align-items:center;min-height:64px;padding:8px 0;cursor:pointer;background:none;border:0;width:100%;text-align:left;position:relative}
+.lrow::before{content:"";position:absolute;left:21px;top:-8px;height:16px;border-left:2px dashed var(--line)}
+.lrow:first-of-type::before{display:none}
+.node{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--surface-2);color:var(--muted);font:700 14px/1 var(--font);border:2px solid transparent}
+.node.av{border-color:var(--accent);color:var(--accent);background:var(--surface)}
+.node.ip{background:var(--accent-tint);color:var(--accent)}
+.node.dn{background:var(--correct);color:#fff}
+.node.ms{background:var(--warn);color:#3a2a00}
+.lrow .tt{font:600 16px/21px var(--font);letter-spacing:-.01em}
+.lrow .mm{font-size:13px;color:var(--muted)}
+.lrow.cur{background:var(--surface);border-radius:16px;box-shadow:var(--e2);padding:10px 12px;margin:6px -12px;width:calc(100% + 24px);border:1px solid var(--line)}
+
+/* ---------- kviz ---------- */
+.qmeta{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:6px 0 10px}
+.qtext{font:600 clamp(18px,1rem + .8vw,22px)/1.35 var(--font);letter-spacing:-.012em;margin:0 0 16px;text-wrap:balance}
+.qimg{position:relative;width:100%;aspect-ratio:4/3;border-radius:20px;background:var(--surface-2);box-shadow:inset 0 0 0 1px rgb(0 0 0/.06);margin:0 0 16px;overflow:hidden;cursor:zoom-in}
+.qimg img{width:100%;height:100%;object-fit:contain;display:block;opacity:0;transition:opacity .25s}
+.qimg img.ld{opacity:1}
+.qimg::before{content:"";position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgb(255 255 255/.25) 50%,transparent 70%);background-size:200% 100%;animation:shimmer 1.2s infinite}
+.qimg.ld::before{display:none}
+@keyframes shimmer{from{background-position:150% 0}to{background-position:-50% 0}}
+@media (prefers-color-scheme:dark){ .qimg img{filter:brightness(.9)} }
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{display:flex;gap:12px;align-items:flex-start;width:100%;min-height:56px;padding:14px 16px;text-align:left;cursor:pointer;
+  border:1.5px solid var(--line);border-radius:14px;background:var(--surface);box-shadow:0 2px 0 var(--line);
+  font:500 17px/24px var(--font);letter-spacing:-.006em;
+  transition:transform 80ms var(--ease-out),box-shadow 80ms var(--ease-out),border-color .15s,background-color .15s,opacity .2s}
+@media (hover:hover){ .opt:not([disabled]):hover{border-color:var(--line-strong);transform:translateY(-1px);box-shadow:0 3px 0 var(--line),var(--e2)} }
+.opt:not([disabled]):active{transform:translateY(2px);box-shadow:0 0 0 var(--line);background:var(--surface-2)}
+.bdg{flex:none;width:28px;height:28px;display:grid;place-items:center;border-radius:50%;background:var(--surface-2);color:var(--ink-2);font:700 13px/1 var(--font);margin-top:-2px;transition:transform .2s var(--ease-spring),background-color .15s}
+.multi .bdg{border-radius:7px}
+.opt .tx{flex:1;padding-top:0}
+.opt .st{font:600 12px/16px var(--font);letter-spacing:.02em;display:none;margin-top:4px}
+.opt.sel{border:2px solid var(--accent);padding:13.5px 15.5px;background:var(--accent-tint);box-shadow:0 2px 0 var(--accent-lip)}
+.opt.sel .bdg{background:var(--accent);color:var(--on-accent);animation:pop .2s var(--ease-spring)}
+.opt.ok{border:2px solid var(--correct);padding:13.5px 15.5px;background:var(--correct-tint);box-shadow:0 2px 0 var(--correct-lip)}
+.opt.ok .bdg{background:var(--correct);color:var(--on-accent)}
+.opt.ok.me{animation:popbig .36s var(--ease-spring)}
+.opt.bad{border:2px solid var(--wrong);padding:13.5px 15.5px;background:var(--wrong-tint);box-shadow:0 2px 0 var(--wrong-lip);animation:shake .36s cubic-bezier(.36,.07,.19,.97)}
+.opt.bad .bdg{background:var(--wrong);color:var(--on-accent)}
+.opt.miss{border:2px dashed var(--correct);padding:13.5px 15.5px;background:var(--surface);box-shadow:none}
+.opt.miss .bdg{background:none;border:2px solid var(--correct);color:var(--correct-ink)}
+.opt.ok .st,.opt.bad .st,.opt.miss .st{display:block}
+.opt.ok .st{color:var(--correct-ink)} .opt.bad .st{color:var(--wrong-ink)} .opt.miss .st{color:var(--correct-ink)}
+.opt.dim{opacity:.5}
+.opt[disabled]{cursor:default}
+@media (prefers-color-scheme:dark){ .opt.ok .bdg,.opt.bad .bdg,.opt.sel .bdg{color:#0D0F13} }
+.enter>*{animation:enter .28s var(--ease-enter) both}
+.enter>*:nth-child(2){animation-delay:30ms}.enter>*:nth-child(3){animation-delay:60ms}.enter>*:nth-child(4){animation-delay:90ms}
+.enter>*:nth-child(5){animation-delay:120ms}.enter>*:nth-child(6){animation-delay:150ms}
+@keyframes enter{from{opacity:0;transform:translateY(24px)}}
+@keyframes pop{from{transform:scale(.85)}}
+@keyframes popbig{50%{transform:scale(1.03)}}
+@keyframes shake{0%,100%{transform:translateX(0)}15%{transform:translateX(-6px)}30%{transform:translateX(6px)}45%{transform:translateX(-4px)}60%{transform:translateX(4px)}75%{transform:translateX(-2px)}}
+.combo{animation:pop .3s var(--ease-spring)}
+.need{font-variant-numeric:tabular-nums}
+.need.left{background:var(--wrong-tint);color:var(--wrong-ink)}
+.need.met{background:var(--correct-tint);color:var(--correct-ink)}
+
+/* dock + sheet */
+.dock{position:fixed;left:0;right:0;bottom:0;z-index:6;padding:16px 16px calc(16px + env(safe-area-inset-bottom));
+  background:linear-gradient(to top,var(--bg) 62%,color-mix(in oklab,var(--bg) 0%,transparent))}
+.dock .in{max-width:640px;margin:0 auto;display:flex;gap:10px}
+.dock .btn.sec{flex:0 0 auto;width:auto;padding:0 16px;font-size:15px}
+.kbd{font:600 11px/1 var(--font);padding:3px 5px;border-radius:5px;border:1px solid currentColor;opacity:.55;margin-left:6px}
+@media (pointer:coarse){ .kbd{display:none} }
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:8;padding:20px 20px calc(20px + env(safe-area-inset-bottom));
+  border-radius:28px 28px 0 0;box-shadow:var(--e3);transform:translateY(110%);transition:transform .32s var(--ease-enter);max-height:70dvh;overflow:auto}
+.sheet.on{transform:none}
+.sheet.ok{background:var(--correct-tint)} .sheet.bad{background:var(--wrong-tint)} .sheet.warn{background:var(--warn-tint)}
+@media (min-width:700px){ .sheet{left:50%;right:auto;bottom:16px;width:min(640px,calc(100% - 32px));transform:translate(-50%,130%);border-radius:24px}
+  .sheet.on{transform:translate(-50%,0)} }
+.sh-h{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.sh-ic{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;flex:none;color:#fff}
+.ok .sh-ic{background:var(--correct)} .bad .sh-ic{background:var(--wrong)} .warn .sh-ic{background:var(--warn);color:#3a2a00}
+.sh-t{font:700 20px/26px var(--display);letter-spacing:-.015em}
+.ok .sh-t{color:var(--correct-ink)} .bad .sh-t{color:var(--wrong-ink)} .warn .sh-t{color:var(--warn-ink)}
+.sh-t:focus{outline:none}
+body.sheet-open #app{padding-bottom:calc(330px + env(safe-area-inset-bottom))}
+.sh-b{font-size:15.5px;line-height:23px;color:var(--ink-2);margin:0 0 14px;text-wrap:pretty}
+.sh-b ul{margin:6px 0 0;padding-left:18px}
+.sh-b li{margin:2px 0;color:var(--ink);font-weight:500}
+
+/* rezime / ispit */
+.center{text-align:center}
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:16px 0}
+.tile{background:var(--surface-2);border-radius:14px;padding:12px 8px;text-align:center}
+.tile b{display:block;font:800 24px/28px var(--display);letter-spacing:-.02em}
+.tile span{font-size:12px;color:var(--muted)}
+.misses{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px;text-align:left}
+.misses li{border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:var(--surface)}
+.misses .qq{font-weight:600;margin-bottom:6px;line-height:22px}
+.misses .aa{color:var(--correct-ink);font-size:14.5px;line-height:21px}
+.misses .yy{color:var(--wrong-ink);font-size:14.5px;line-height:21px;text-decoration:line-through;opacity:.8}
+.timer{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 12px;font:600 15px/20px var(--font);font-variant-numeric:tabular-nums;background:var(--surface-2);color:var(--ink-2)}
+.timer.w{background:var(--warn-tint);color:var(--warn-ink)} .timer.d{background:var(--wrong-tint);color:var(--wrong-ink)}
+.timer.pulse{animation:pop .4s var(--ease-spring)}
+.grid41{display:grid;grid-template-columns:repeat(auto-fill,minmax(44px,1fr));gap:8px;margin-top:14px}
+.g41{height:44px;border-radius:12px;border:1.5px solid var(--line);background:var(--surface);font:600 14px/1 var(--font);cursor:pointer;position:relative;font-variant-numeric:tabular-nums}
+.g41.ans{background:var(--accent-tint);border-color:var(--accent);color:var(--accent)}
+.g41.fl::after{content:"";position:absolute;top:4px;right:4px;width:8px;height:8px;border-radius:50%;background:var(--warn)}
+.g41.cur{outline:2px solid var(--ink);outline-offset:2px}
+.g41.ok{background:var(--correct-tint);border-color:var(--correct);color:var(--correct-ink)}
+.g41.bad{background:var(--wrong-tint);border-color:var(--wrong);color:var(--wrong-ink)}
+.verdict{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:6px 14px;font:700 15px/20px var(--font)}
+.modal{position:fixed;inset:0;z-index:20;background:rgb(0 0 0/.45);display:none;align-items:flex-end;justify-content:center;padding:16px}
+.modal.on{display:flex}
+.modal .box{background:var(--surface);border-radius:24px;padding:20px;width:min(560px,100%);max-height:88dvh;overflow:auto;box-shadow:var(--e2);animation:enter .28s var(--ease-enter)}
+@media (min-width:700px){ .modal{align-items:center} }
+.zoom{position:fixed;inset:0;z-index:30;background:rgb(0 0 0/.9);display:none;place-items:center;cursor:zoom-out}
+.zoom.on{display:grid}
+.zoom img{max-width:96vw;max-height:94dvh;border-radius:10px}
+#konfete{position:fixed;inset:0;pointer-events:none;z-index:40}
+.empty{padding:48px 12px;text-align:center;color:var(--muted)}
+.skel{height:120px;border-radius:20px;background:var(--surface-2);margin-bottom:12px;animation:pulse 1.2s infinite alternate}
+@keyframes pulse{to{opacity:.5}}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:1ms!important;animation-delay:0ms!important;transition-duration:1ms!important}
+  .qimg img,.sheet{transition-duration:150ms!important}
+}
+@media (max-width:420px){ .t1{font-size:26px;line-height:32px} .hero{gap:14px} .bignum{font-size:40px;line-height:44px} }
+</style>
+</head>
+<body>
+<main id="app" aria-live="polite"></main>
+<div class="dock" id="dock" hidden><div class="in" id="dockin"></div></div>
+<section class="sheet" id="sheet" role="status" aria-live="polite"></section>
+<div class="modal" id="modal" role="dialog" aria-modal="true"><div class="box" id="modalbox"></div></div>
+<div class="zoom" id="zoom"><img alt=""></div>
+<canvas id="konfete"></canvas>
+
+<script>
+/* ================== osnova ================== */
+const L = "ABCDEFGH";
+const $ = s => document.querySelector(s);
+const esc = t => String(t ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const pct = (a,b) => b ? Math.round(100*a/b) : 0;
+const api = (u, body) => fetch(u, body ? {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)} : {}).then(r => r.json());
+const ls = { get(k,d){ try{ const v = localStorage.getItem(k); return v===null ? d : JSON.parse(v); }catch(e){ return d; } },
+             set(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} } };
+const IC = {
+  zvuk:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13"/></svg>',
+  tiho:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4V5z"/><path d="m22 9-6 6M16 9l6 6"/></svg>',
+  x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+  ok:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17 19 7"/></svg>',
+  no:'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M7 7l10 10M17 7 7 17"/></svg>',
+  q:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14"/><circle cx="12" cy="18" r=".6" fill="currentColor"/></svg>',
+  grid:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="6" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5"/><rect x="14" y="14" width="6" height="6" rx="1.5"/></svg>',
+  flag:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg>',
+};
+const S = { view:"pocetna", P:null, zvuk:ls.get("zvuk", true) };
+
+/* ================== zvuk + haptika (UX izveštaj #16, #17) ================== */
+let AC;
+function ton(f1, f2, dur, tip="sine", kasni=0, jac=.08){
+  if(!S.zvuk || S.rezim==="ispit") return;
+  try{
+    AC = AC || new (window.AudioContext||window.webkitAudioContext)();
+    const t = AC.currentTime + kasni, o = AC.createOscillator(), g = AC.createGain();
+    o.type = tip; o.frequency.setValueAtTime(f1, t); if(f2) o.frequency.exponentialRampToValueAtTime(f2, t+dur);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(jac, t+.012); g.gain.exponentialRampToValueAtTime(.0001, t+dur);
+    o.connect(g).connect(AC.destination); o.start(t); o.stop(t+dur+.02);
+  }catch(e){}
+}
+const zvuk = {
+  tacno(){ ton(660,null,.07); ton(990,null,.09,"sine",.075); vib(12); },
+  netacno(){ ton(196,150,.18,"triangle",0,.1); vib([30,50,30]); },
+  kraj(){ [523,659,784,1047].forEach((f,i)=>ton(f,null,.12,"sine",i*.09,.07)); vib([20,40,20,40,60]); },
+  izbor(){ vib(8); },
+};
+function vib(p){ try{ navigator.vibrate?.(p); }catch(e){} }
+
+/* ================== konfete (samo prekretnice) ================== */
+function konfete(){
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const c = $("#konfete"), x = c.getContext("2d"), W = c.width = innerWidth*devicePixelRatio, H = c.height = innerHeight*devicePixelRatio;
+  c.style.width = innerWidth+"px"; c.style.height = innerHeight+"px";
+  const boje = ["#D92D20","#1D5BD8","#F5B400","#16803C","#FFFFFF"];
+  const ps = Array.from({length:90}, () => ({x:W/2+(Math.random()-.5)*W*.3, y:H*.35, vx:(Math.random()-.5)*18*devicePixelRatio,
+    vy:(-Math.random()*16-6)*devicePixelRatio, r:Math.random()*Math.PI, vr:(Math.random()-.5)*.4, s:(5+Math.random()*6)*devicePixelRatio,
+    c:boje[Math.floor(Math.random()*boje.length)], tri:Math.random()<.35}));
+  const t0 = performance.now();
+  (function f(t){
+    const dt = t - t0; x.clearRect(0,0,W,H);
+    ps.forEach(p => { p.vy += .55*devicePixelRatio; p.x += p.vx; p.y += p.vy; p.vx *= .99; p.r += p.vr;
+      x.save(); x.translate(p.x,p.y); x.rotate(p.r); x.globalAlpha = Math.max(0, 1 - dt/1600); x.fillStyle = p.c;
+      if(p.tri){ x.beginPath(); x.moveTo(0,-p.s); x.lineTo(p.s,p.s); x.lineTo(-p.s,p.s); x.fill(); } else x.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);
+      x.restore(); });
+    if(dt < 1600) requestAnimationFrame(f); else x.clearRect(0,0,W,H);
+  })(t0);
+}
+
+/* ================== prsten ================== */
+function prsten(p, size=120, sw=10, centar=""){
+  const r = (size-sw)/2, done = p >= 100;
+  return `<div class="ringwrap" style="width:${size}px;height:${size}px">
+    <svg class="ring ${done?"done":""}" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="transform:rotate(-90deg)" aria-hidden="true">
+      <circle class="trk" cx="${size/2}" cy="${size/2}" r="${r}" stroke-width="${sw}"/>
+      <circle class="val" cx="${size/2}" cy="${size/2}" r="${r}" stroke-width="${sw}" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100" data-p="${Math.min(100,p)}" ${p<=0?'stroke-opacity="0"':""}/>
+    </svg><div class="c">${centar}</div></div>`;
+}
+function animirajPrstenove(){ requestAnimationFrame(()=>requestAnimationFrame(()=>document.querySelectorAll(".ring .val").forEach(c => c.style.strokeDashoffset = 100 - (+c.dataset.p)))); }
+
+/* ================== POČETNA ================== */
+const MESECI = ["jan","feb","mar","apr","maj","jun","jul","avg","sep","okt","nov","dec"];
+function datum(iso){ const d = new Date(iso+"T00:00:00"); return `${d.getDate()}. ${MESECI[d.getMonth()]}`; }
+function danaDo(iso){ const d = new Date(iso+"T00:00:00"), n = new Date(); n.setHours(0,0,0,0); return Math.round((d-n)/864e5); }
+
+async function pocetna(){
+  S.view = "pocetna"; S.rezim = null; zatvoriSheet(); dock(null); clearInterval(S.tajmer);
+  if(!S.P) $("#app").innerHTML = `<div style="height:90px"></div><div class="skel"></div><div class="skel" style="height:220px"></div><div class="skel"></div>`;
+  S.P = await api("/api/pocetna");
+  const P = S.P, x = P.pregled, dd = P.ispit_datum ? danaDo(P.ispit_datum) : null;
+  const cur = P.lekcije[P.trenutna_lekcija ?? 0];
+  const sansaKl = P.sansa_prolaz < 50 ? "r" : P.sansa_prolaz < 85 ? "a" : "g";
+  const delta = P.sansa_juce == null ? "" : (P.sansa_prolaz - P.sansa_juce);
+  const oblasti = [...P.oblasti].filter(o=>o.kvota).sort((a,b)=>b.gubitak-a.gubitak);
+  const maxGub = Math.max(...oblasti.map(o=>o.gubitak), 1);
+  const ukGub = oblasti.reduce((a,o)=>a+o.gubitak,0);
+  const nizChip = P.niz_dana ? `<span class="chip warn tnum">🔥 ${P.niz_dana} ${P.niz_dana===1?"dan":"dana"}</span>` : "";
+  const greske = P.lekcije.reduce((a,l)=>a+l.greske,0);
+  const histMap = Object.fromEntries(P.istorija.map(h=>[h.dan,h]));
+  const hist = P.tacke.map(t => histMap[t.dan] || {dan:t.dan, odg:0, tacno:0, novih:0});
+  const maxOdg = Math.max(...hist.map(h=>h.odg), 1);
+  const ispiti = P.ispiti || [];
+
+  $("#app").innerHTML = `
+  <header class="home-top">
+    <div><div class="overline">${esc(danasTekst())}</div>
+      <h1 class="t1">${dd > 0 ? `Ispit za ${dd} ${dd===1?"dan":"dana"}` : dd === 0 ? "Danas je ispit 🍀" : "Vozački B"}</h1></div>
+    <button class="iconbtn" id="zvukbtn" aria-label="${S.zvuk?"Isključi zvuk":"Uključi zvuk"}" title="Zvuk (M)">${S.zvuk?IC.zvuk:IC.tiho}</button>
+  </header>
+
+  <section class="card raised">
+    <div class="hero">
+      ${prsten(pct(x.danas_novih, x.cilj_danas), 124, 11, `<b class="tnum">${x.danas_novih}</b><span class="tnum">od ${x.cilj_danas}</span>`)}
+      <div class="hero-stats">
+        <div class="overline">Danas</div>
+        <div class="row"><span class="ink2">Novih pitanja</span><b class="tnum">${x.ostalo_danas ? `još ${x.ostalo_danas}` : "✓ gotovo"}</b></div>
+        <div class="row"><span class="ink2">Ponavljanja</span><b class="tnum">${x.ponavljanja}</b></div>
+        <div class="row"><span class="ink2">Tačnost danas</span><b class="tnum">${x.odg_danas ? pct(x.tacno_danas,x.odg_danas)+"%" : "–"}</b></div>
+        <div style="margin-top:4px">${nizChip}</div>
+      </div>
+    </div>
+    <button class="btn cta" id="nastavi"><span class="btn-col">Nastavi učenje<small>${cur ? esc(skrati(cur.ime, 44)) : "sve lekcije pređene"}</small></span></button>
+    <div class="btnrow">
+      <button class="btn sec" id="greskebtn">Greške ${greske ? `<span class="chip bad tnum">${greske}</span>` : ""}</button>
+      <button class="btn sec" id="ispitbtn">Simulacija ispita</button>
+    </div>
+  </section>
+
+  ${P.dan_pred_ispit ? planDanas(P) : ""}
+  <section class="card">
+    <div class="sechead"><div class="overline">${P.ispit_datum ? "Plan do ispita" : "Plan učenja"}</div><span class="label muted tnum">${P.tacke.filter(t=>t.stanje===2).length}/${P.tacke.length} dana ispunjeno</span></div>
+    <div class="track" style="margin-top:12px">${P.tacke.map(t=>`<span class="dot s${t.stanje} ${t.dan===P.danas?"today":""}" title="${t.dan}"></span>`).join("")}<span class="flag" title="${P.ispit_datum ? "Ispit " + datum(P.ispit_datum) : "Kraj plana"}">🏁</span></div>
+    <div class="track-lbl"><span>${datum(P.tacke[0].dan)}</span><span>${datum(P.tacke.at(-1).dan)}${P.ispit_datum ? " · simulacije" : ""}</span></div>
+  </section>
+
+  <section class="card">
+    <div class="ready">
+      <div><div class="bignum tnum ${sansaKl}">${P.sansa_prolaz}%</div></div>
+      <div><div class="t2">Šansa da položiš</div>
+        <div class="muted" style="font-size:14px;line-height:20px">da je ispit danas${delta!=="" ? ` · <b class="${delta>=0?"":""}" style="color:${delta>=0?"var(--correct-ink)":"var(--wrong-ink)"}">${delta>=0?"+":""}${delta}</b> od juče` : ""}</div></div>
+    </div>
+    <div class="meter"><i style="width:${P.ocekivano}%"></i><span class="thr" style="left:85%"></span></div>
+    <div class="label muted tnum">Očekivano <b style="color:var(--ink)">${P.ocekivano}%</b> bodova · treba 85% · cilj 92%+</div>
+    <div class="areas">
+      <div class="sechead"><span class="overline">Gde gubiš bodove</span><span class="label muted tnum">~${ukGub.toFixed(0)} od 14 dozvoljenih</span></div>
+      ${oblasti.slice(0,6).map(o=>`<div class="area"><span class="nm"><span class="n">${esc(o.ime)}</span><span class="q">· ${o.kvota} na ispitu</span></span>
+        <span class="v tnum">−${o.gubitak.toFixed(1)}</span><span class="bar"><i style="width:${100*o.gubitak/maxGub}%"></i></span></div>`).join("")}
+    </div>
+    <p class="note">Procena: 1500 simuliranih ispita sa pravim kvotama i bodovima, iz tvojih odgovora. Neviđena pitanja računa po tvojoj tačnosti iz prve.</p>
+  </section>
+
+  <section class="card">
+    <div class="sechead"><div class="overline">Mapa lekcija · ${P.lekcije.length}</div><button class="linkbtn" id="svelek">Sve lekcije →</button></div>
+    <div class="map">${P.lekcije.map(l=>`<button class="cell ${bojaLekcije(l)} ${l.i===P.trenutna_lekcija?"cur":""}" data-l="${l.i}" title="${esc(l.ime)} · ${l.vidjeno}/${l.ukupno}" aria-label="${esc(l.ime)}"></button>`).join("")}</div>
+    <div class="legend"><span><i style="background:var(--surface-2)"></i>nije počelo</span><span><i style="background:var(--accent)"></i>u toku</span><span><i style="background:var(--wrong)"></i>greške</span><span><i style="background:var(--warn)"></i>skoro</span><span><i style="background:var(--correct)"></i>savladano</span></div>
+  </section>
+
+  ${ispiti.length ? `<section class="card"><div class="sechead"><div class="overline">Simulacije</div><span class="label muted tnum">prolaz = 85% · poslednja ${pct(ispiti.at(-1).bod, ispiti.at(-1).max)}%</span></div>
+    ${ispiti.at(-1).gubitak && Object.keys(ispiti.at(-1).gubitak).length ? `<p class="label ink2" style="margin:8px 0 0">Poslednja: <b class="tnum">${ispiti.at(-1).bod}/${ispiti.at(-1).max}</b> · najviše izgubljeno: ${Object.entries(ispiti.at(-1).gubitak).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k,v])=>`${esc(skrati(k,22))} <b style="color:var(--wrong-ink)">−${v}</b>`).join(", ")}</p>` : ""}
+    <div class="bars">${ispiti.map(e=>{const p=pct(e.bod,e.max);return `<div class="b"><i style="height:${p}%;background:${p>=85?"var(--correct)":"var(--wrong)"};opacity:.85"></i><span class="tnum">${p}</span></div>`}).join("")}
+    </div></section>` : ""}
+
+  ${P.istorija.length ? `<section class="card"><div class="sechead"><div class="overline">Po danima</div><span class="label muted"><span style="color:var(--accent)">■</span> tačnih · <span style="opacity:.5">■</span> ukupno</span></div>
+    <div class="bars">${hist.map(h=>`<div class="b"><i style="height:${h.odg?Math.max(4,60*h.odg/maxOdg):3}px;${h.dan===P.danas?"outline:2px solid var(--accent);outline-offset:2px":""}"><s style="height:${pct(h.tacno,h.odg)}%"></s></i><span class="tnum">${+h.dan.slice(8)}.</span></div>`).join("")}</div></section>` : ""}
+  `;
+  animirajPrstenove();
+  $("#zvukbtn").onclick = prekidacZvuka;
+  $("#nastavi").onclick = () => kreni("uci");
+  $("#greskebtn").onclick = () => kreni("greske");
+  $("#ispitbtn").onclick = () => pitajIspit();
+  $("#svelek").onclick = lekcijeEkran;
+  document.querySelectorAll(".cell").forEach(b => b.onclick = () => kreni("lekcija", +b.dataset.l));
+  window.scrollTo({top:0});
+}
+function planDanas(P){
+  const o = br => P.oblasti.find(x=>x.br===br) || {vidjeno:0, ukupno:0};
+  const kor = [
+    {t:"Vozačke dozvole + Dužnosti kod nezgode", s:"3 pitanja na ispitu · 57 u bazi", v:o(10).vidjeno+o(11).vidjeno, u:o(10).ukupno+o(11).ukupno},
+    {t:"Saobraćajna signalizacija", s:"13 pitanja na ispitu · najviše bodova po satu", v:o(8).vidjeno, u:o(8).ukupno},
+    {t:"Ostatak Pravila saobraćaja", s:"18 pitanja na ispitu · koliko stigneš", v:o(6).vidjeno, u:o(6).ukupno},
+    {t:"Uveče: Greške + 1 simulacija", s:"pre spavanja, pa spavaj", v:0, u:0, kraj:true},
+  ];
+  return `<section class="card raised" style="border-color:var(--warn)">
+    <div class="sechead"><div class="overline" style="color:var(--warn-ink)">⚡ Plan za danas · sutra je ispit</div></div>
+    <div style="display:flex;flex-direction:column;gap:12px;margin-top:12px">${kor.map((k,i)=>{const gotovo=k.u&&k.v>=k.u;const p=k.u?pct(k.v,k.u):0;
+      return `<div style="display:grid;grid-template-columns:32px 1fr auto;gap:12px;align-items:center">
+        <span class="node ${gotovo?"dn":p?"ip":""}" style="width:32px;height:32px;font-size:13px">${gotovo?IC.ok:i+1}</span>
+        <span><div style="font-weight:600;line-height:20px">${k.t}</div><div class="label muted" style="font-size:13px">${k.s}</div></span>
+        <span class="label tnum muted">${k.u?`${k.v}/${k.u}`:""}</span></div>`}).join("")}</div>
+    <p class="note">„Nastavi učenje" ide tačno ovim redom. Od starih pitanja vraća samo ona koja su ti išla loše. Posledice ne dolaze na ispit, preskačemo.</p>
+  </section>`;
+}
+function danasTekst(){ const d = new Date(); return `${["Nedelja","Ponedeljak","Utorak","Sreda","Četvrtak","Petak","Subota"][d.getDay()]}, ${d.getDate()}. ${MESECI[d.getMonth()]}`; }
+function skrati(t,n){ t = String(t).replace(/\s*\(.*$/,""); return t.length>n ? t.slice(0,n-1)+"…" : t; }
+function bojaLekcije(l){
+  if(!l.vidjeno) return "";
+  if(l.greske/l.vidjeno > .1) return "r";
+  if(l.vidjeno < l.ukupno) return "p";
+  return l.savladano/l.ukupno >= .9 ? "g" : "a";
+}
+function prekidacZvuka(){ S.zvuk = !S.zvuk; ls.set("zvuk", S.zvuk); const b = $("#zvukbtn"); if(b){ b.innerHTML = S.zvuk?IC.zvuk:IC.tiho; } if(S.zvuk) zvuk.izbor(); }
+
+/* ================== LEKCIJE ================== */
+function lekcijeEkran(){
+  S.view = "lekcije"; dock(null);
+  const P = S.P; let html = "", ob = null;
+  P.lekcije.forEach(l => {
+    if(l.oblast !== ob){ ob = l.oblast; html += `<div class="grp overline">${esc(ob)}</div>`; }
+    const done = l.vidjeno===l.ukupno, ms = done && l.savladano/l.ukupno>=.9, cur = l.i===P.trenutna_lekcija;
+    const cls = ms ? "ms" : done ? "dn" : cur ? "av" : l.vidjeno ? "ip" : "";
+    const ikon = ms ? "★" : done ? IC.ok : l.vidjeno ? `<span class="tnum" style="font-size:12px">${pct(l.vidjeno,l.ukupno)}%</span>` : l.i+1;
+    html += `<button class="lrow ${cur?"cur":""}" data-l="${l.i}"><span class="node ${cls}">${ikon}</span>
+      <span><div class="tt">${esc(skrati(l.ime,70))}</div><div class="mm tnum">${l.vidjeno}/${l.ukupno} viđeno${l.vidjeno?` · ${pct(l.savladano,l.vidjeno)}% sigurno`:""}${l.greske?` · <span style="color:var(--wrong-ink)">${l.greske} grešaka</span>`:""}</div></span>
+      ${cur ? `<span class="chip acc">Nastavi</span>` : `<span class="muted">›</span>`}</button>`;
+  });
+  $("#app").innerHTML = `<div class="topbar" id="tb"><button class="iconbtn" id="nazad" aria-label="Nazad">${IC.x}</button><h2 class="t2" style="flex:1">Sve lekcije</h2></div>${html}`;
+  $("#nazad").onclick = pocetna;
+  document.querySelectorAll(".lrow").forEach(b => b.onclick = () => kreni("lekcija", +b.dataset.l));
+  window.scrollTo({top:0}); pratiSkrol();
+}
+function pratiSkrol(){ const tb = $("#tb"); if(!tb) return; const f = () => tb.classList.toggle("scrolled", scrollY > 4); onscroll = f; f(); }
+
+/* ================== UČENJE (tura) ================== */
+async function kreni(rezim, lekcija){
+  S.rezim = rezim; S.view = "kviz"; zatvoriSheet();
+  if(rezim === "ispit") return ispitKreni();
+  const n = 15;
+  $("#app").innerHTML = `<div style="height:80px"></div><div class="skel" style="height:260px"></div>`; dock(null);
+  const r = await api(`/api/tura?n=${n}&rezim=${rezim}${lekcija!=null?`&l=${lekcija}`:""}`);
+  if(!r.pitanja.length){ $("#app").innerHTML = `<div class="topbar"><button class="iconbtn" id="nazad">${IC.x}</button></div><div class="empty"><div class="t2">${rezim==="greske"?"Nema grešaka 🎉":"Nema pitanja za sada 🎉"}</div><p>Vrati se na početnu.</p></div>`; $("#nazad").onclick = pocetna; return; }
+  // red: svako pitanje jednom; greška se vraća 3–4 mesta kasnije dok ne bude tačno (UX #4)
+  Object.assign(S, { red: r.pitanja.map(q => ({q, ponovo:false})), i:0, rez:[], combo:0, jedinstvena:r.pitanja.length,
+    resena:new Set(), pregledPre:r.pregled, izabrani:new Set(), faza:"odgovara" });
+  prikaziPitanje();
+}
+
+function prikaziPitanje(){
+  const it = S.red[S.i], q = it.q, multi = q.treba > 1;
+  if(it.ponovo) q.odgovori = mesaj([...q.odgovori]);
+  S.izabrani = new Set(); S.faza = "odgovara"; zatvoriSheet();
+  const napr = pct(S.resena.size, S.jedinstvena);
+  $("#app").innerHTML = `
+  <div class="topbar" id="tb">
+    <button class="iconbtn" id="nazad" aria-label="Kraj ture (Esc)">${IC.x}</button>
+    <div class="prog" role="progressbar" aria-valuenow="${napr}" aria-valuemin="0" aria-valuemax="100"><i id="progi" style="width:${napr}%"></i></div>
+    ${S.combo >= 3 ? `<span class="chip warn tnum combo">🔥 ${S.combo}</span>` : ""}
+    ${(S.pregled||S.pregledPre) ? prsten(pct((S.pregled||S.pregledPre).danas_novih,(S.pregled||S.pregledPre).cilj_danas), 30, 4, "") : ""}
+  </div>
+  <div class="enter" id="qwrap">
+    <div class="qmeta">
+      ${it.ponovo ? `<span class="chip bad">↻ još jednom</span>` : q.ponavljanje ? `<span class="chip warn">↻ ponavljanje${q.gresaka?` · ${q.gresaka}× pogrešeno`:""}</span>` : `<span class="chip acc">novo</span>`}
+      <span class="chip need ${multi?"left":""}" id="need">${multi ? `Označi ${q.treba} · <span class="tnum">0/${q.treba}</span>` : "Jedan odgovor"}</span>
+      <span class="chip tnum">${q.bodova} ${q.bodova===1?"bod":"boda"}</span>
+    </div>
+    <div class="label muted" style="margin:-4px 0 8px">${esc(skrati(q.lekcija, 80))}</div>
+    <h2 class="qtext">${esc(q.tekst)}</h2>
+    ${q.slika ? `<div class="qimg" id="qimg"><img src="/${q.slika}" alt="Slika uz pitanje" width="800" height="600" decoding="async"></div>` : ""}
+    <div class="opts ${multi?"multi":""}" role="${multi?"group":"radiogroup"}">
+      ${q.odgovori.map((o,j)=>`<button class="opt" data-id="${o.id}" role="${multi?"checkbox":"radio"}" aria-checked="false">
+        <span class="bdg">${L[j]}</span><span class="tx">${esc(o.tekst)}<span class="st"></span></span></button>`).join("")}
+    </div>
+  </div>`;
+  $("#nazad").onclick = () => zavrsiTuru(true);
+  document.querySelectorAll(".opt").forEach(b => b.onclick = () => izaberi(+b.dataset.id));
+  slikaSetup();
+  predUcitaj();
+  dockOdgovor();
+  window.scrollTo({top:0}); pratiSkrol();
+}
+function mesaj(a){ for(let i=a.length-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]] = [a[j],a[i]]; } return a; }
+function slikaSetup(){
+  const w = $("#qimg"); if(!w) return; const img = w.querySelector("img");
+  const ok = () => { img.classList.add("ld"); w.classList.add("ld"); };
+  img.complete ? ok() : img.onload = ok;
+  w.onclick = () => { $("#zoom img").src = img.src; $("#zoom").classList.add("on"); };
+}
+function predUcitaj(){ const n = S.red?.[S.i+1]?.q; if(n?.slika){ const im = new Image(); im.src = "/"+n.slika; } }
+
+function izaberi(id){
+  if(S.faza !== "odgovara") return;
+  const q = trenutno();
+  if(q.treba === 1) S.izabrani = new Set([id]);
+  else if(S.izabrani.has(id)) S.izabrani.delete(id);
+  else if(S.izabrani.size < q.treba) S.izabrani.add(id);
+  else return vib(20);
+  zvuk.izbor();
+  document.querySelectorAll(".opt").forEach(b => { const on = S.izabrani.has(+b.dataset.id); b.classList.toggle("sel", on); b.setAttribute("aria-checked", on);
+    const j = q.odgovori.findIndex(o=>o.id===+b.dataset.id); b.querySelector(".bdg").innerHTML = on && q.treba>1 ? IC.ok.replace('width="18" height="18"','width="15" height="15"') : L[j]; });
+  const need = $("#need");
+  if(need && q.treba > 1){ const n = S.izabrani.size; need.className = `chip need ${n===q.treba?"met":"left"}`; need.innerHTML = `Označi ${q.treba} · <span class="tnum">${n}/${q.treba}</span>`; }
+  if(S.rezim === "ispit") ispitSacuvaj(); else dockOdgovor();
+}
+function trenutno(){ return S.rezim === "ispit" ? S.ispit.pitanja[S.ispit.i] : S.red[S.i].q; }
+
+function dockOdgovor(){
+  const q = trenutno(), n = S.izabrani.size, ok = n === q.treba;
+  dock(`<button class="btn sec" id="nesig" ${ok?"":"disabled"} title="Shift+Enter">Nisam siguran</button>
+        <button class="btn" id="proveri" ${ok?"":"disabled"}>${ok ? `Proveri<span class="kbd">↵</span>` : q.treba>1 ? `Označi još ${q.treba-n}` : "Izaberi odgovor"}</button>`);
+  $("#proveri").onclick = () => proveri(false);
+  $("#nesig").onclick = () => proveri(true);
+}
+
+async function proveri(nesiguran){
+  const it = S.red[S.i], q = it.q;
+  if(S.faza !== "odgovara" || S.izabrani.size !== q.treba) return;
+  S.faza = "provera";
+  const izabrani = [...S.izabrani];
+  const r = await api("/api/odgovor", {id:q.id, izabrani, nesiguran, bez_zapisa:it.ponovo});
+  S.faza = "povratna";
+  if(!it.ponovo) S.rez.push({q, izabrani, tacno:r.tacno, tacni:r.tacni, nesiguran});
+  S.pregled = r.pregled;
+  if(r.tacno){ S.resena.add(q.id); S.combo = nesiguran ? 0 : S.combo+1; zvuk.tacno(); }
+  else { S.combo = 0; zvuk.netacno(); S.red.splice(Math.min(S.i+4, S.red.length), 0, {q:{...q}, ponovo:true}); }
+  // opcije: stanje + tekst (ne samo boja)
+  document.querySelectorAll(".opt").forEach(b => {
+    const id = +b.dataset.id, tac = r.tacni.includes(id), izb = izabrani.includes(id), st = b.querySelector(".st"), bd = b.querySelector(".bdg");
+    b.disabled = true; b.classList.remove("sel");
+    if(tac && izb){ b.classList.add("ok","me"); bd.innerHTML = IC.ok; st.textContent = "Tačno"; }
+    else if(izb){ b.classList.add("bad"); bd.innerHTML = IC.no; st.textContent = "Netačno"; }
+    else if(tac){ b.classList.add("miss"); bd.innerHTML = IC.ok; st.textContent = "Tačan odgovor · propušteno"; }
+    else b.classList.add("dim");
+  });
+  const pi = $("#progi"); if(pi){ pi.style.width = pct(S.resena.size,S.jedinstvena)+"%"; if(r.tacno){ pi.classList.remove("sheen"); void pi.offsetWidth; pi.classList.add("sheen"); } }
+  const tacTekst = q.odgovori.filter(o=>r.tacni.includes(o.id)).map(o=>`<li>${esc(o.tekst)}</li>`).join("");
+  const kraj = S.i+1 >= S.red.length;
+  if(r.tacno && nesiguran) sheet("warn", IC.q, "Tačno, ali pogađao si", `Vraća se sutra da proverimo da li stvarno znaš.`, kraj);
+  else if(r.tacno) sheet("ok", IC.ok, pohvala(), `+${q.bodova} ${q.bodova===1?"bod":"boda"}${S.combo>=3?` · 🔥 ${S.combo} zaredom`:""}`, kraj);
+  else sheet("bad", IC.no, "Netačno", `${q.treba>1?"Tačni odgovori":"Tačan odgovor"}:<ul>${tacTekst}</ul><div class="muted" style="margin-top:8px;font-size:13.5px">↻ Vraća se za par pitanja · ${esc(skrati(q.lekcija,50))}</div>`, kraj);
+}
+const POHVALE = ["Tačno!","Bravo!","Odlično!","Tako je!","Precizno!"];
+function pohvala(){ return S.combo>=5 ? "Nezaustavljiv!" : POHVALE[Math.floor(Math.random()*POHVALE.length)]; }
+
+function sheet(tip, ikon, naslov, telo, kraj){
+  const sh = $("#sheet");
+  sh.className = `sheet ${tip}`;
+  sh.innerHTML = `<div class="sh-h"><span class="sh-ic">${ikon}</span><span class="sh-t" id="sht" tabindex="-1">${naslov}</span></div>
+    <div class="sh-b">${telo}</div>
+    <button class="btn ${tip==="bad"?"bad":tip==="ok"?"ok":""}" id="dalje">${kraj?"Završi turu":"Dalje"}<span class="kbd">↵</span></button>`;
+  dock(null);
+  document.body.classList.add("sheet-open");
+  requestAnimationFrame(()=>{ sh.classList.add("on"); $("#sht").focus({preventScroll:true}); });
+  $("#dalje").onclick = dalje;
+}
+function zatvoriSheet(){ $("#sheet").classList.remove("on"); document.body.classList.remove("sheet-open"); }
+function dalje(){ if(S.faza !== "povratna") return; if(S.i+1 < S.red.length){ S.i++; prikaziPitanje(); } else zavrsiTuru(false); }
+
+async function zavrsiTuru(prekinuto){
+  zatvoriSheet(); dock(null);
+  if(!S.rez.length){ return pocetna(); }
+  const tac = S.rez.filter(r=>r.tacno && !r.nesiguran).length, sve = S.rez.length;
+  const bod = S.rez.filter(r=>r.tacno).reduce((a,r)=>a+r.q.bodova,0), maxb = S.rez.reduce((a,r)=>a+r.q.bodova,0);
+  const p = pct(S.rez.filter(r=>r.tacno).length, sve);
+  const pre = S.pregledPre, posle = S.pregled || pre;
+  const ciljSad = posle && pre && pre.danas_novih < pre.cilj_danas && posle.danas_novih >= posle.cilj_danas;
+  const greske = S.rez.filter(r=>!r.tacno);
+  if(!prekinuto) zvuk.kraj();
+  if(ciljSad || (p === 100 && sve >= 10)) setTimeout(konfete, 250);
+  const verd = p >= 92 ? ["ok","Spreman nivo"] : p >= 85 ? ["warn","Prolaz, ali tesno"] : ["bad","Još malo"];
+  $("#app").innerHTML = `
+  <div style="height:calc(28px + env(safe-area-inset-top))"></div>
+  <div class="center enter">
+    <div class="overline">${ciljSad ? "🎯 Dnevni cilj ispunjen!" : prekinuto ? "Tura prekinuta" : "Tura gotova"}</div>
+    <div style="display:grid;place-items:center;margin:16px 0 10px">${prsten(p,160,13,`<b class="tnum" id="brojac">0%</b><span>iz prve</span>`)}</div>
+    <span class="chip ${verd[0]}" style="font-size:14px;padding:5px 12px">${verd[1]}</span>
+    <div class="tiles">
+      <div class="tile"><b class="tnum" style="color:var(--correct-ink)">${S.rez.filter(r=>r.tacno).length}</b><span>tačno</span></div>
+      <div class="tile"><b class="tnum" style="color:var(--wrong-ink)">${greske.length}</b><span>greške</span></div>
+      <div class="tile"><b class="tnum">${bod}/${maxb}</b><span>bodova</span></div>
+    </div>
+    ${posle ? `<p class="label muted tnum" style="margin:-4px 0 16px">Danas ${posle.danas_novih}/${posle.cilj_danas} novih · tačnost danas ${pct(posle.tacno_danas,posle.odg_danas)}%</p>` : ""}
+    ${greske.length ? `<div class="overline" style="text-align:left;margin:8px 0">Šta da zapamtiš</div><ul class="misses">${greske.map(r=>`<li>
+      <div class="qq">${esc(r.q.tekst)}</div>
+      ${r.q.odgovori.filter(o=>r.izabrani.includes(o.id) && !r.tacni.includes(o.id)).map(o=>`<div class="yy">✕ ${esc(o.tekst)}</div>`).join("")}
+      ${r.q.odgovori.filter(o=>r.tacni.includes(o.id)).map(o=>`<div class="aa">✓ ${esc(o.tekst)}</div>`).join("")}</li>`).join("")}</ul>`
+      : `<p class="t2" style="margin-top:8px">Bez ijedne greške 🔥</p>`}
+  </div>`;
+  animirajPrstenove(); brojac($("#brojac"), p, "%");
+  dock(`<button class="btn sec" id="kuci">Početna</button><button class="btn" id="jos">Sledeća tura<span class="kbd">↵</span></button>`);
+  $("#kuci").onclick = pocetna; $("#jos").onclick = () => kreni(S.rezim === "lekcija" ? "uci" : S.rezim);
+  S.view = "rezime"; S.P = null; window.scrollTo({top:0});
+}
+function brojac(el, cilj, suf=""){ if(!el) return; const t0 = performance.now(); (function f(t){ const k = Math.min(1,(t-t0)/800), e = 1-Math.pow(1-k,3); el.textContent = Math.round(cilj*e)+suf; if(k<1) requestAnimationFrame(f); })(t0); }
+
+function dock(html){ const d = $("#dock"); if(!html){ d.hidden = true; $("#dockin").innerHTML = ""; return; } d.hidden = false; $("#dockin").innerHTML = html; }
+
+/* ================== ISPIT (UX #8) ================== */
+function pitajIspit(){
+  modal(`<div class="t2">Simulacija ispita</div>
+    <p class="ink2">41 pitanje · 45 minuta · iste kvote po oblastima kao na pravom ispitu. Bez povratne informacije dok ne predaš. Prolaz je 85% bodova.</p>
+    <p class="muted" style="font-size:14px">Možeš da se vraćaš na pitanja i da ih obeležiš zastavicom (F). Sve greške iz simulacije se pamte i idu u „Greške".</p>
+    <div class="btnrow"><button class="btn sec" id="mne">Odustani</button><button class="btn" id="mda">Kreni</button></div>`);
+  $("#mne").onclick = zatvoriModal; $("#mda").onclick = () => { zatvoriModal(); kreni("ispit"); };
+}
+async function ispitKreni(){
+  $("#app").innerHTML = `<div style="height:80px"></div><div class="skel" style="height:260px"></div>`;
+  const r = await api(`/api/tura?n=41&rezim=ispit`);
+  S.ispit = { pitanja:r.pitanja, i:0, odg:new Map(), zast:new Set(), kraj:Date.now()+45*60e3 };
+  clearInterval(S.tajmer); S.tajmer = setInterval(ispitTik, 1000);
+  ispitPrikazi();
+}
+function ispitTik(){
+  const t = Math.max(0, S.ispit.kraj - Date.now()), el = $("#timer");
+  if(el){ el.textContent = `${String(Math.floor(t/60e3)).padStart(2,"0")}:${String(Math.floor(t/1e3)%60).padStart(2,"0")}`;
+    el.className = `timer tnum ${t<=60e3?"d":t<=5*60e3?"w":""} ${t<=60e3 && Math.floor(t/1e3)%10===0?"pulse":""}`; }
+  if(t === 0){ clearInterval(S.tajmer); ispitPredaj(true); }
+}
+function ispitPrikazi(){
+  const E = S.ispit, q = E.pitanja[E.i], multi = q.treba > 1, sel = E.odg.get(q.id) || new Set();
+  S.izabrani = new Set(sel); S.faza = "odgovara";
+  const odgovoreno = [...E.odg.values()].filter(s=>s.size).length;
+  $("#app").innerHTML = `
+  <div class="topbar" id="tb">
+    <button class="iconbtn" id="nazad" aria-label="Prekini ispit">${IC.x}</button>
+    <span class="timer tnum" id="timer" role="timer">45:00</span>
+    <div class="prog"><i style="width:${pct(odgovoreno,E.pitanja.length)}%"></i></div>
+    <button class="iconbtn" id="mreza" aria-label="Pregled pitanja">${IC.grid}</button>
+  </div>
+  <div class="enter">
+    <div class="qmeta">
+      <span class="chip tnum">Pitanje ${E.i+1}/${E.pitanja.length}</span>
+      <span class="chip need ${multi?(sel.size===q.treba?"met":"left"):""}" id="need">${multi?`Označi ${q.treba} · <span class="tnum">${sel.size}/${q.treba}</span>`:"Jedan odgovor"}</span>
+      <span class="chip tnum">${q.bodova} ${q.bodova===1?"bod":"boda"}</span>
+      ${E.zast.has(q.id)?`<span class="chip warn">⚑ obeleženo</span>`:""}
+    </div>
+    <h2 class="qtext">${esc(q.tekst)}</h2>
+    ${q.slika ? `<div class="qimg" id="qimg"><img src="/${q.slika}" alt="Slika uz pitanje" width="800" height="600"></div>` : ""}
+    <div class="opts ${multi?"multi":""}">${q.odgovori.map((o,j)=>`<button class="opt ${sel.has(o.id)?"sel":""}" data-id="${o.id}"><span class="bdg">${sel.has(o.id)&&multi?IC.ok:L[j]}</span><span class="tx">${esc(o.tekst)}</span></button>`).join("")}</div>
+  </div>`;
+  $("#nazad").onclick = () => { modal(`<div class="t2">Prekinuti simulaciju?</div><p class="ink2">Odgovori se neće računati.</p><div class="btnrow"><button class="btn sec" id="mne">Nastavi ispit</button><button class="btn bad" id="mda">Prekini</button></div>`);
+    $("#mne").onclick = zatvoriModal; $("#mda").onclick = () => { zatvoriModal(); clearInterval(S.tajmer); pocetna(); }; };
+  $("#mreza").onclick = ispitMreza;
+  document.querySelectorAll(".opt").forEach(b => b.onclick = () => izaberi(+b.dataset.id));
+  slikaSetup(); ispitTik();
+  const posl = E.i+1 >= E.pitanja.length;
+  dock(`<button class="btn sec" id="pret" ${E.i?"":"disabled"} aria-label="Prethodno">←</button>
+        <button class="btn sec" id="zast" title="F">${IC.flag.replace("<svg",'<svg width="18" height="18"')}</button>
+        <button class="btn" id="sled">${posl?"Predaj ispit":"Sledeće"}<span class="kbd">↵</span></button>`);
+  $("#pret").onclick = () => { E.i--; ispitPrikazi(); };
+  $("#zast").onclick = () => { E.zast.has(q.id) ? E.zast.delete(q.id) : E.zast.add(q.id); ispitPrikazi(); };
+  $("#sled").onclick = () => posl ? ispitPotvrdi() : (E.i++, ispitPrikazi());
+  window.scrollTo({top:0}); pratiSkrol();
+}
+function ispitSacuvaj(){ const E = S.ispit, q = E.pitanja[E.i]; E.odg.set(q.id, new Set(S.izabrani)); }
+function ispitMreza(){
+  const E = S.ispit;
+  modal(`<div class="sechead"><div class="t2">Pregled</div><button class="iconbtn" id="mx">${IC.x}</button></div>
+    <div class="legend"><span><i style="background:var(--accent)"></i>odgovoreno</span><span><i style="background:var(--surface-2)"></i>bez odgovora</span><span><i style="background:var(--warn)"></i>obeleženo</span></div>
+    <div class="grid41">${E.pitanja.map((q,k)=>{const s=E.odg.get(q.id);return `<button class="g41 tnum ${s&&s.size===q.treba?"ans":""} ${E.zast.has(q.id)?"fl":""} ${k===E.i?"cur":""}" data-k="${k}">${k+1}</button>`}).join("")}</div>
+    <button class="btn" id="predaj" style="margin-top:16px">Predaj ispit</button>`);
+  $("#mx").onclick = zatvoriModal;
+  document.querySelectorAll(".g41").forEach(b => b.onclick = () => { E.i = +b.dataset.k; zatvoriModal(); ispitPrikazi(); });
+  $("#predaj").onclick = () => { zatvoriModal(); ispitPotvrdi(); };
+}
+function ispitPotvrdi(){
+  const E = S.ispit, bez = E.pitanja.filter(q => (E.odg.get(q.id)?.size||0) !== q.treba).length;
+  modal(`<div class="t2">Predati ispit?</div><p class="ink2">${bez ? `<b style="color:var(--wrong-ink)">${bez} pitanja</b> nisu potpuno odgovorena i nosiće 0 bodova.` : "Sva pitanja su odgovorena."}${E.zast.size?` Obeleženo: ${E.zast.size}.`:""}</p>
+    <div class="btnrow"><button class="btn sec" id="mne">Nazad</button><button class="btn" id="mda">Predaj</button></div>`);
+  $("#mne").onclick = zatvoriModal; $("#mda").onclick = () => { zatvoriModal(); ispitPredaj(false); };
+}
+async function ispitPredaj(isteklo){
+  clearInterval(S.tajmer); dock(null);
+  const E = S.ispit;
+  $("#app").innerHTML = `<div class="empty"><div class="t2">Ocenjujem…</div></div>`;
+  const rez = await Promise.all(E.pitanja.map(q => api("/api/odgovor", {id:q.id, izabrani:[...(E.odg.get(q.id)||[])], ispit:true})
+    .then(r => ({q, izabrani:[...(E.odg.get(q.id)||[])], tacno:r.tacno, tacni:r.tacni}))));
+  const bod = rez.filter(r=>r.tacno).reduce((a,r)=>a+r.q.bodova,0), maxb = E.pitanja.reduce((a,q)=>a+q.bodova,0);
+  const prag = Math.ceil(.85*maxb), prosao = bod >= prag, p = pct(bod,maxb);
+  const gub = {}; rez.filter(r=>!r.tacno).forEach(r => { const k = r.q.oblast; gub[k] = (gub[k]||0) + r.q.bodova; });
+  api("/api/ispit_rezultat", {bod, max:maxb, tacnih:rez.filter(r=>r.tacno).length, gubitak:gub, pogresna:rez.filter(r=>!r.tacno).map(r=>r.q.id)});
+  S.ispitRez = rez; S.rezim = null;
+  if(prosao) setTimeout(konfete, 300);
+  $("#app").innerHTML = `
+  <div style="height:calc(28px + env(safe-area-inset-top))"></div>
+  <div class="center enter">
+    <div class="overline">${isteklo ? "Vreme je isteklo" : "Simulacija ispita"}</div>
+    <div style="display:grid;place-items:center;margin:16px 0 12px">${prsten(p,160,13,`<b class="tnum" id="brojac">0</b><span class="tnum">od ${maxb} bod.</span>`)}</div>
+    <span class="verdict" style="background:var(--${prosao?"correct":"wrong"}-tint);color:var(--${prosao?"correct":"wrong"}-ink)">${prosao?"✓ POLOŽIO BI":"✕ NE BI PROŠAO"}</span>
+    <p class="label muted tnum" style="margin:10px 0 0">${p}% · prag ${prag} bodova · ${rez.filter(r=>r.tacno).length}/41 tačnih${p>=92?" · 🎯 cilj 92%":""}</p>
+    ${Object.keys(gub).length ? `<div class="card" style="text-align:left;margin-top:18px"><div class="overline">Izgubljeni bodovi po oblasti</div><div class="areas">
+      ${Object.entries(gub).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`<div class="area"><span class="nm">${esc(k)}</span><span class="v tnum" style="color:var(--wrong-ink)">−${v}</span></div>`).join("")}</div></div>` : ""}
+    <div class="card" style="text-align:left"><div class="overline">Sva pitanja · dodirni za detalje</div>
+      <div class="grid41">${rez.map((r,k)=>`<button class="g41 tnum ${r.tacno?"ok":"bad"}" data-k="${k}">${k+1}</button>`).join("")}</div></div>
+  </div>`;
+  animirajPrstenove(); brojac($("#brojac"), bod);
+  document.querySelectorAll(".g41").forEach(b => b.onclick = () => ispitDetalj(+b.dataset.k));
+  dock(`<button class="btn sec" id="kuci">Početna</button><button class="btn" id="jos">Nova simulacija</button>`);
+  $("#kuci").onclick = () => { S.P = null; pocetna(); }; $("#jos").onclick = () => kreni("ispit");
+  S.view = "ispit-rezultat"; window.scrollTo({top:0});
+}
+function ispitDetalj(k){
+  const r = S.ispitRez[k], q = r.q;
+  modal(`<div class="sechead"><span class="chip ${r.tacno?"ok":"bad"}">${r.tacno?"✓ tačno":"✕ netačno"} · ${q.bodova} bod.</span><button class="iconbtn" id="mx">${IC.x}</button></div>
+    <h3 class="qtext" style="margin-top:12px">${esc(q.tekst)}</h3>
+    ${q.slika?`<div class="qimg ld"><img class="ld" src="/${q.slika}" alt=""></div>`:""}
+    <div class="opts ${q.treba>1?"multi":""}">${q.odgovori.map((o,j)=>{const t=r.tacni.includes(o.id), i=r.izabrani.includes(o.id);
+      return `<div class="opt ${t&&i?"ok":i?"bad":t?"miss":"dim"}" style="animation:none"><span class="bdg">${t?IC.ok:i?IC.no:L[j]}</span><span class="tx">${esc(o.tekst)}<span class="st">${t&&i?"Tvoj odgovor · tačno":i?"Tvoj odgovor":t?"Tačan odgovor":""}</span></span></div>`}).join("")}</div>`);
+  $("#mx").onclick = zatvoriModal;
+}
+
+/* ================== modal, tastatura ================== */
+function modal(html){ $("#modalbox").innerHTML = html; $("#modal").classList.add("on"); }
+function zatvoriModal(){ $("#modal").classList.remove("on"); }
+$("#modal").onclick = e => { if(e.target.id === "modal") zatvoriModal(); };
+$("#zoom").onclick = () => $("#zoom").classList.remove("on");
+
+document.addEventListener("keydown", e => {
+  if(e.metaKey || e.ctrlKey || e.altKey) return;
+  if($("#zoom").classList.contains("on")){ if(e.key==="Escape"||e.key==="z"||e.key==="Z") $("#zoom").classList.remove("on"); return; }
+  if($("#modal").classList.contains("on")){ if(e.key==="Escape") zatvoriModal(); if(e.key==="Enter"){ const b = $("#modal #mda"); if(b){ e.preventDefault(); b.click(); } } return; }
+  const k = e.key.toUpperCase();
+  if(k === "M"){ prekidacZvuka(); return; }
+  if(S.view !== "kviz"){
+    if(e.key === "Enter"){ const b = $("#jos") || (S.view==="pocetna" && $("#nastavi")); if(b){ e.preventDefault(); b.click(); } }
+    if(e.key === "Escape" && S.view !== "pocetna"){ S.P = null; pocetna(); }
+    return;
+  }
+  if(k === "Z"){ const w = $("#qimg"); if(w) w.click(); return; }
+  if(e.key === "Escape"){ $("#nazad")?.click(); return; }
+  if(S.rezim === "ispit"){
+    if(e.key === "ArrowRight" || e.key === "Enter"){ e.preventDefault(); $("#sled")?.click(); return; }
+    if(e.key === "ArrowLeft"){ $("#pret")?.click(); return; }
+    if(k === "F"){ $("#zast")?.click(); return; }
+  } else if(e.key === "Enter" || e.key === " "){
+    e.preventDefault();
+    if(S.faza === "povratna") return dalje();
+    if(S.faza === "odgovara") return proveri(e.shiftKey);
+    return;
+  }
+  const q = trenutno(); if(!q || S.faza !== "odgovara") return;
+  let j = L.indexOf(k); if(j < 0 && /^[1-8]$/.test(e.key)) j = +e.key - 1;
+  if(j >= 0 && j < q.odgovori.length) izaberi(q.odgovori[j].id);
+});
+if(document.fonts?.ready) document.fonts.ready.then(()=>{});
+pocetna();
+</script>
+</body>
+</html>

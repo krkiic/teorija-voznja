@@ -1,0 +1,16 @@
+# Lični napredak — nikad u repo
+napredak.json
+Napredak.md
+Greske.md
+
+# Sirovi izvoz sa portala (vezan za kandidatski nalog)
+pitanja_raw.json
+
+# Obsidian beleške iz napravi_pitanja.py --beleske
+/Oblasti/
+/Oblasti.md
+
+simulacije/
+*.log
+__pycache__/
+.DS_Store
