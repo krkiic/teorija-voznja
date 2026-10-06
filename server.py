@@ -10,6 +10,9 @@ import kviz
 PORT = int(__import__("os").environ.get("KVIZ_PORT", 8777))
 APP = kviz.KOD / "app"
 LOCK = threading.Lock()
+# isti index.html služi i statički sajt (GitHub Pages) i ovaj server; lokalno ga prebacujemo na Python API i napredak.json
+META_STATIC = b'<meta name="kviz-backend" content="static">'
+META_SERVER = b'<meta name="kviz-backend" content="server">'
 
 
 # Lekcije redom kao na portalu: [(oblast_br, oblast, lekcija, [id...])]
@@ -136,10 +139,12 @@ class H(http.server.SimpleHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(b)
 
-    def _file(self, path, ctype):
+    def _file(self, path, ctype, zamena=None):
         if not path.is_file():
             return self.send_error(404)
         b = path.read_bytes()
+        if zamena:
+            b = b.replace(*zamena)
         self.send_response(200)
         self.send_header("Content-Type", ctype)
         self.send_header("Content-Length", str(len(b)))
@@ -151,7 +156,9 @@ class H(http.server.SimpleHTTPRequestHandler):
         u = urllib.parse.urlparse(self.path)
         qs = urllib.parse.parse_qs(u.query)
         if u.path in ("/", "/index.html"):
-            return self._file(APP / "index.html", "text/html; charset=utf-8")
+            return self._file(APP / "index.html", "text/html; charset=utf-8", (META_STATIC, META_SERVER))
+        if u.path == "/kviz.js":  # index.html ga uvek učitava; sa meta „server" samo postavi režim i ne dira Python API
+            return self._file(APP / "kviz.js", "text/javascript; charset=utf-8")
         if u.path.startswith("/slike/"):
             ime = u.path.rsplit("/", 1)[-1]
             if not ime.replace(".", "").isalnum():

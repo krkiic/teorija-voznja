@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="kviz-backend" content="static">
 <meta name="theme-color" content="#F5F4F0" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#0D0F13" media="(prefers-color-scheme: dark)">
 <title>Vozački B</title>
@@ -266,6 +267,14 @@ body.sheet-open #app{padding-bottom:calc(330px + env(safe-area-inset-bottom))}
 .zoom img{max-width:96vw;max-height:94dvh;border-radius:10px}
 #konfete{position:fixed;inset:0;pointer-events:none;z-index:40}
 .empty{padding:48px 12px;text-align:center;color:var(--muted)}
+/* postavke (samo statički sajt) */
+.top-act{display:flex;gap:8px;flex:none}
+.set-sec{margin-top:20px}
+.set-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px}
+.inp{flex:2 1 150px;min-width:0;min-height:48px;padding:0 14px;border:1.5px solid var(--line-strong);border-radius:14px;background:var(--surface);color:var(--ink);font:500 16px/24px var(--font)}
+.set-row .btn{flex:1 1 auto;width:auto;min-height:48px;padding:0 18px;font-size:15px}
+.btnrow.auto{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}
+.postmsg{margin:10px 0 0;min-height:20px} .postmsg.ok{color:var(--correct-ink)} .postmsg.bad{color:var(--wrong-ink)}
 .skel{height:120px;border-radius:20px;background:var(--surface-2);margin-bottom:12px;animation:pulse 1.2s infinite alternate}
 @keyframes pulse{to{opacity:.5}}
 
@@ -284,13 +293,18 @@ body.sheet-open #app{padding-bottom:calc(330px + env(safe-area-inset-bottom))}
 <div class="zoom" id="zoom"><img alt=""></div>
 <canvas id="konfete"></canvas>
 
+<script src="kviz.js"></script>
 <script>
 /* ================== osnova ================== */
 const L = "ABCDEFGH";
 const $ = s => document.querySelector(s);
 const esc = t => String(t ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const pct = (a,b) => b ? Math.round(100*a/b) : 0;
-const api = (u, body) => fetch(u, body ? {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)} : {}).then(r => r.json());
+// dva režima: „server" = Python API (server.py, napredak.json) · „static" = kviz.js u pregledaču (GitHub Pages, napredak u localStorage)
+const STATIC = (window.KVIZ_MODE || document.querySelector('meta[name="kviz-backend"]')?.content) === "static";
+const api = STATIC
+  ? async (u, body) => { await window.KVIZ_READY; return window.KVIZ.api(u, body); }
+  : (u, body) => fetch(u, body ? {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body)} : {}).then(r => r.json());
 const ls = { get(k,d){ try{ const v = localStorage.getItem(k); return v===null ? d : JSON.parse(v); }catch(e){ return d; } },
              set(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} } };
 const IC = {
@@ -301,6 +315,7 @@ const IC = {
   no:'<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M7 7l10 10M17 7 7 17"/></svg>',
   q:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M9.5 9a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6V14"/><circle cx="12" cy="18" r=".6" fill="currentColor"/></svg>',
   grid:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="6" height="6" rx="1.5"/><rect x="14" y="4" width="6" height="6" rx="1.5"/><rect x="4" y="14" width="6" height="6" rx="1.5"/><rect x="14" y="14" width="6" height="6" rx="1.5"/></svg>',
+  sl:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4"/></svg>',
   flag:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg>',
 };
 const S = { view:"pocetna", P:null, zvuk:ls.get("zvuk", true) };
@@ -377,13 +392,14 @@ async function pocetna(){
   const histMap = Object.fromEntries(P.istorija.map(h=>[h.dan,h]));
   const hist = P.tacke.map(t => histMap[t.dan] || {dan:t.dan, odg:0, tacno:0, novih:0});
   const maxOdg = Math.max(...hist.map(h=>h.odg), 1);
-  const ispiti = P.ispiti || [];
+  const ispiti = (P.ispiti || []).filter(e => e && typeof e === "object");   // uvezeni napredak.json može imati bilo šta
+  const zvukBtn = `<button class="iconbtn" id="zvukbtn" aria-label="${S.zvuk?"Isključi zvuk":"Uključi zvuk"}" title="Zvuk (M)">${S.zvuk?IC.zvuk:IC.tiho}</button>`;
 
   $("#app").innerHTML = `
   <header class="home-top">
     <div><div class="overline">${esc(danasTekst())}</div>
       <h1 class="t1">${dd > 0 ? `Ispit za ${dd} ${dd===1?"dan":"dana"}` : dd === 0 ? "Danas je ispit 🍀" : "Vozački B"}</h1></div>
-    <button class="iconbtn" id="zvukbtn" aria-label="${S.zvuk?"Isključi zvuk":"Uključi zvuk"}" title="Zvuk (M)">${S.zvuk?IC.zvuk:IC.tiho}</button>
+    ${STATIC ? `<div class="top-act"><button class="iconbtn" id="postbtn" aria-label="Postavke" title="Postavke">${IC.sl}</button>${zvukBtn}</div>` : zvukBtn}
   </header>
 
   <section class="card raised">
@@ -434,7 +450,7 @@ async function pocetna(){
   </section>
 
   ${ispiti.length ? `<section class="card"><div class="sechead"><div class="overline">Simulacije</div><span class="label muted tnum">prolaz = 85% · poslednja ${pct(ispiti.at(-1).bod, ispiti.at(-1).max)}%</span></div>
-    ${ispiti.at(-1).gubitak && Object.keys(ispiti.at(-1).gubitak).length ? `<p class="label ink2" style="margin:8px 0 0">Poslednja: <b class="tnum">${ispiti.at(-1).bod}/${ispiti.at(-1).max}</b> · najviše izgubljeno: ${Object.entries(ispiti.at(-1).gubitak).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k,v])=>`${esc(skrati(k,22))} <b style="color:var(--wrong-ink)">−${v}</b>`).join(", ")}</p>` : ""}
+    ${ispiti.at(-1).gubitak && Object.keys(ispiti.at(-1).gubitak).length ? `<p class="label ink2" style="margin:8px 0 0">Poslednja: <b class="tnum">${esc(ispiti.at(-1).bod)}/${esc(ispiti.at(-1).max)}</b> · najviše izgubljeno: ${Object.entries(ispiti.at(-1).gubitak).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([k,v])=>`${esc(skrati(k,22))} <b style="color:var(--wrong-ink)">−${esc(v)}</b>`).join(", ")}</p>` : ""}
     <div class="bars">${ispiti.map(e=>{const p=pct(e.bod,e.max);return `<div class="b"><i style="height:${p}%;background:${p>=85?"var(--correct)":"var(--wrong)"};opacity:.85"></i><span class="tnum">${p}</span></div>`}).join("")}
     </div></section>` : ""}
 
@@ -443,6 +459,7 @@ async function pocetna(){
   `;
   animirajPrstenove();
   $("#zvukbtn").onclick = prekidacZvuka;
+  if(STATIC) $("#postbtn").onclick = () => postavke();
   $("#nastavi").onclick = () => kreni("uci");
   $("#greskebtn").onclick = () => kreni("greske");
   $("#ispitbtn").onclick = () => pitajIspit();
@@ -477,6 +494,61 @@ function bojaLekcije(l){
   return l.savladano/l.ukupno >= .9 ? "g" : "a";
 }
 function prekidacZvuka(){ S.zvuk = !S.zvuk; ls.set("zvuk", S.zvuk); const b = $("#zvukbtn"); if(b){ b.innerHTML = S.zvuk?IC.zvuk:IC.tiho; } if(S.zvuk) zvuk.izbor(); }
+
+/* ================== POSTAVKE (samo statički sajt) ================== */
+async function postavke(poruka, tip){
+  const isp = await KVIZ.getIspit();
+  modal(`<div class="sechead"><div class="t2">Postavke</div><button class="iconbtn" id="mx" aria-label="Zatvori">${IC.x}</button></div>
+    <div class="set-sec"><label class="overline" for="ispdat">Datum ispita</label>
+      <div class="set-row"><input class="inp" type="date" id="ispdat" value="${esc(isp || "")}">
+        <button class="btn" id="ispsnimi">Sačuvaj</button>${isp ? `<button class="btn sec" id="ispbrisi">Ukloni</button>` : ""}</div>
+      <p class="note">Odbrojavanje do ispita i plan po danima. Bez datuma plan traje 14 dana.</p></div>
+    <div class="set-sec"><div class="overline">Napredak</div>
+      <p class="note" style="margin-top:6px">Napredak se čuva samo u ovom pregledaču. Pre brisanja podataka sajta ili prelaska na drugi uređaj izvezi ga, pa ga ovde uvezi.${window.KVIZ_STORAGE === "memorija" ? " <b>Ovaj pregledač ne dozvoljava čuvanje (privatan prozor?), pa napredak nestaje kad zatvoriš karticu.</b>" : ""}</p>
+      <div class="btnrow auto"><button class="btn sec" id="izvezi">Izvezi napredak</button><button class="btn sec" id="uvezi">Uvezi napredak</button></div>
+      <input type="file" id="uvezifajl" accept=".json,application/json" hidden>
+      <p class="label postmsg ${tip || ""}" id="postmsg" role="status">${esc(poruka || "")}</p></div>
+    <p class="note" style="margin-top:12px">Pitanja i slike pripadaju MUP-u RS, a ova aplikacija je nezvanična i nije povezana sa MUP-om ni sa eUpravom.</p>`);
+  const msg = (t, k) => { const m = $("#postmsg"); m.textContent = t; m.className = `label postmsg ${k}`; };
+  const dat = $("#ispdat"), snimi = $("#ispsnimi");
+  const postaviIspit = async v => {
+    // greška u godini (npr. 3026) napravila bi plan od hiljada dana, a početna se posle toga ne bi mogla učitati
+    const g = new Date(); g.setFullYear(g.getFullYear() + 3);
+    if(v && v > `${g.getFullYear()}-${String(g.getMonth()+1).padStart(2,"0")}-${String(g.getDate()).padStart(2,"0")}`) return msg("Datum ispita može biti najviše 3 godine unapred.", "bad");
+    let ok; try{ ok = await KVIZ.setIspit(v); }catch(e){ ok = false; }
+    if(ok === false) return msg("Datum nije sačuvan.", "bad");
+    zatvoriModal(); pocetna();
+  };
+  snimi.disabled = !dat.value;
+  dat.oninput = () => { snimi.disabled = !dat.value; };
+  snimi.onclick = () => postaviIspit(dat.value);
+  if(isp) $("#ispbrisi").onclick = () => postaviIspit(null);
+  $("#mx").onclick = zatvoriModal;
+  $("#izvezi").onclick = async () => {
+    try{
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([await KVIZ.izvezi()], {type:"application/json"}));
+      a.download = "napredak.json"; document.body.append(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+      msg("Preuzet je napredak.json.", "ok");
+    }catch(e){ msg("Izvoz nije uspeo.", "bad"); }
+  };
+  $("#uvezi").onclick = () => $("#uvezifajl").click();
+  $("#uvezifajl").onchange = async e => {
+    const f = e.target.files[0]; e.target.value = "";
+    if(!f) return;
+    let tekst; try{ tekst = await f.text(); }catch(err){ return msg("Fajl se ne može pročitati.", "bad"); }
+    // ne koristimo id „mda": Enter u modalu ne sme slučajno da prepiše napredak
+    modal(`<div class="t2">Zameniti napredak?</div><p class="ink2">Napredak iz fajla „${esc(f.name)}" zamenjuje ono što je sada sačuvano u ovom pregledaču. Ovo se ne može poništiti.</p>
+      <div class="btnrow"><button class="btn sec" id="mne">Odustani</button><button class="btn bad" id="mzam">Zameni</button></div>`);
+    $("#mne").onclick = () => postavke();
+    $("#mzam").onclick = async () => {
+      let r; try{ r = await KVIZ.uvezi(tekst); }catch(err){ r = {ok:false, error:err.message}; }
+      if(r && r.ok){ zatvoriModal(); pocetna(); }
+      else postavke(`Uvoz nije uspeo${r && r.error ? ": " + r.error : "."}`, "bad");
+    };
+  };
+}
 
 /* ================== LEKCIJE ================== */
 function lekcijeEkran(){
@@ -532,7 +604,7 @@ function prikaziPitanje(){
     </div>
     <div class="label muted" style="margin:-4px 0 8px">${esc(skrati(q.lekcija, 80))}</div>
     <h2 class="qtext">${esc(q.tekst)}</h2>
-    ${q.slika ? `<div class="qimg" id="qimg"><img src="/${q.slika}" alt="Slika uz pitanje" width="800" height="600" decoding="async"></div>` : ""}
+    ${q.slika ? `<div class="qimg" id="qimg"><img src="${q.slika}" alt="Slika uz pitanje" width="800" height="600" decoding="async"></div>` : ""}
     <div class="opts ${multi?"multi":""}" role="${multi?"group":"radiogroup"}">
       ${q.odgovori.map((o,j)=>`<button class="opt" data-id="${o.id}" role="${multi?"checkbox":"radio"}" aria-checked="false">
         <span class="bdg">${L[j]}</span><span class="tx">${esc(o.tekst)}<span class="st"></span></span></button>`).join("")}
@@ -552,7 +624,7 @@ function slikaSetup(){
   img.complete ? ok() : img.onload = ok;
   w.onclick = () => { $("#zoom img").src = img.src; $("#zoom").classList.add("on"); };
 }
-function predUcitaj(){ const n = S.red?.[S.i+1]?.q; if(n?.slika){ const im = new Image(); im.src = "/"+n.slika; } }
+function predUcitaj(){ const n = S.red?.[S.i+1]?.q; if(n?.slika){ const im = new Image(); im.src = n.slika; } }
 
 function izaberi(id){
   if(S.faza !== "odgovara") return;
@@ -701,7 +773,7 @@ function ispitPrikazi(){
       ${E.zast.has(q.id)?`<span class="chip warn">⚑ obeleženo</span>`:""}
     </div>
     <h2 class="qtext">${esc(q.tekst)}</h2>
-    ${q.slika ? `<div class="qimg" id="qimg"><img src="/${q.slika}" alt="Slika uz pitanje" width="800" height="600"></div>` : ""}
+    ${q.slika ? `<div class="qimg" id="qimg"><img src="${q.slika}" alt="Slika uz pitanje" width="800" height="600"></div>` : ""}
     <div class="opts ${multi?"multi":""}">${q.odgovori.map((o,j)=>`<button class="opt ${sel.has(o.id)?"sel":""}" data-id="${o.id}"><span class="bdg">${sel.has(o.id)&&multi?IC.ok:L[j]}</span><span class="tx">${esc(o.tekst)}</span></button>`).join("")}</div>
   </div>`;
   $("#nazad").onclick = () => { modal(`<div class="t2">Prekinuti simulaciju?</div><p class="ink2">Odgovori se neće računati.</p><div class="btnrow"><button class="btn sec" id="mne">Nastavi ispit</button><button class="btn bad" id="mda">Prekini</button></div>`);
@@ -769,7 +841,7 @@ function ispitDetalj(k){
   const r = S.ispitRez[k], q = r.q;
   modal(`<div class="sechead"><span class="chip ${r.tacno?"ok":"bad"}">${r.tacno?"✓ tačno":"✕ netačno"} · ${q.bodova} bod.</span><button class="iconbtn" id="mx">${IC.x}</button></div>
     <h3 class="qtext" style="margin-top:12px">${esc(q.tekst)}</h3>
-    ${q.slika?`<div class="qimg ld"><img class="ld" src="/${q.slika}" alt=""></div>`:""}
+    ${q.slika?`<div class="qimg ld"><img class="ld" src="${q.slika}" alt=""></div>`:""}
     <div class="opts ${q.treba>1?"multi":""}">${q.odgovori.map((o,j)=>{const t=r.tacni.includes(o.id), i=r.izabrani.includes(o.id);
       return `<div class="opt ${t&&i?"ok":i?"bad":t?"miss":"dim"}" style="animation:none"><span class="bdg">${t?IC.ok:i?IC.no:L[j]}</span><span class="tx">${esc(o.tekst)}<span class="st">${t&&i?"Tvoj odgovor · tačno":i?"Tvoj odgovor":t?"Tačan odgovor":""}</span></span></div>`}).join("")}</div>`);
   $("#mx").onclick = zatvoriModal;
@@ -809,7 +881,7 @@ document.addEventListener("keydown", e => {
   if(j >= 0 && j < q.odgovori.length) izaberi(q.odgovori[j].id);
 });
 if(document.fonts?.ready) document.fonts.ready.then(()=>{});
-pocetna();
+pocetna().catch(() => { $("#app").innerHTML = `<div class="empty"><div class="t2">Ne mogu da učitam podatke</div><p>Osveži stranicu i pokušaj ponovo.</p></div>`; });
 </script>
 </body>
 </html>

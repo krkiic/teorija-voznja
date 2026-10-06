@@ -1,5 +1,6 @@
 # Lični napredak — nikad u repo
 napredak.json
+napredak*.json
 Napredak.md
 Greske.md
 
@@ -11,6 +12,7 @@ pitanja_raw.json
 /Oblasti.md
 
 simulacije/
+_site/
 *.log
 __pycache__/
 .DS_Store
